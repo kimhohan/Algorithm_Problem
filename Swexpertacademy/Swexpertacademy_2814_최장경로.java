@@ -22,7 +22,8 @@ public class 최장경로2 {
             }
             ans = 0;
             for(int i = 1; i <= N; i++) {
-                ans = Math.max(ans, dfs(i, 1<<i }
+                ans = Math.max(ans, dfs(i, 1 << i)); 
+	}
             System.out.println("#" + tc + " " + ans);
         }
     }
