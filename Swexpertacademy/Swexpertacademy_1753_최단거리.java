@@ -66,14 +66,18 @@ public class Solution_1753 {
 			else {
 				D[i] = new Edge(i, Integer.MAX_VALUE);
 			}
-			// 다넣지 말자
-			//pq.add(D[i]);
+			// if(edge.w == Integer.MAX_VALUE) break; 가있으면
+			pq.add(D[i]);
 		}
-		check[start] = true;
-		pq.add(D[start]);
+		// if(edge.w == Integer.MAX_VALUE) break; 가없으면
+		//check[start] = true;
+		//pq.add(D[start]);
 		
 		while(!pq.isEmpty()) {
 			Edge edge = pq.poll();
+			
+			// 중요!
+			if(edge.w == Integer.MAX_VALUE) break;
 			
 			for(Edge n : adj[edge.v]) {
 				if(!check[n.v] && D[n.v].w > D[edge.v].w + n.w) {
