@@ -1,116 +1,108 @@
-package 크루스칼;
+package dijkstra;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
-public class Solution_1251 {
-	static int n;
-	static double w;
-	static double edges[][];
-	static int []x;
-	static int []y;
+public class Solution_1753 {
 	
-	static double []p;
-	static double []r;
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+	static class Edge implements Comparable<Edge>{
+		int v, w;
+		public Edge(int v, int w) {
+			this.v = v;
+			this.w = w;
+		}
+		@Override
+		public int compareTo(Edge arg0) {
+			// TODO Auto-generated method stub
+			return Integer.compare(this.w, arg0.w);
+		}
 		
-		int t = sc.nextInt();
+	}
+	
+	static int V, E, start;
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		//Scanner sc = new Scanner(System.in);
+		StringTokenizer st;
+		st = new StringTokenizer(br.readLine(), " ");
 		
-		for(int tc = 1; tc <= t; tc++) {
-			n = sc.nextInt();
-			int E = (n*(n-1))/2;
-			p = new double[n];
-			r = new double[n];
-			x = new int[n];
-			y = new int[n];
-			edges = new double[E][3];
-			
-			// x입력
-			for(int i = 0; i < n; i++) {
-				x[i]  =sc.nextInt();
+//		V = sc.nextInt();
+//		V = V + 1;
+//		E = sc.nextInt();
+//		E = E + 1;
+//		start = sc.nextInt();
+		V= Integer.parseInt(st.nextToken());
+		V =V + 1;
+		E = Integer.parseInt(st.nextToken());
+		E = E+1;
+		start = Integer.parseInt(br.readLine());
+		
+		List<Edge> [] adj = new ArrayList[V];
+		for(int i = 1; i < V; i++) {
+			adj[i] = new ArrayList<>();
+		}
+		
+		for(int i = 1; i < E; i++) {
+			st = new StringTokenizer(br.readLine(), " ");
+			//adj[sc.nextInt()].add(new Edge(sc.nextInt(), sc.nextInt()));
+			adj[ Integer.parseInt(st.nextToken())].add(new Edge( Integer.parseInt(st.nextToken()),  Integer.parseInt(st.nextToken())));
+		}
+		
+		//다익스트라
+		PriorityQueue<Edge> pq = new PriorityQueue<>();
+		boolean[] check = new boolean[V];
+		Edge[] D = new Edge[V];
+		
+		for(int i = 1; i < V; i++) {
+			if(i == start) {
+				D[i] = new Edge(i, 0);
 			}
-			// y입력
-			for (int i = 0; i < n; i++) {
-				y[i] = sc.nextInt();
+			else {
+				D[i] = new Edge(i, Integer.MAX_VALUE);
 			}
-			w =sc.nextDouble();
+			// 이문제의 경우 다넣을려면  if(edge.w == Integer.MAX_VALUE) break; 가 필요
+			// 시작점으로 돌아오지못하는 형태의 그래프가 존재할수있다(선분이 두개로 나누어져서 생기는 경우)
+			pq.add(D[i]);
+		}
+		
+		// if(edge.w == Integer.MAX_VALUE) break; 가없으면
+		//check[start] = true;
+		//pq.add(D[start]);
+		
+		while(!pq.isEmpty()) {
+			Edge edge = pq.poll();
 			
-			// 크루스칼 시작
-			int cnt = 0;
-			for(int i = 0; i < n; i++) {
-				for(int k = i + 1; k < n; k++) {
-					edges[cnt][0] = i;
-					edges[cnt][1] = k;
-					edges[cnt][2] = Math.pow(x[i] - x[k],2) + Math.pow(y[i] -y[k], 2);
-					cnt++;
+			// 중요!
+			// 이것을 넣으면 모든 점을 다넣을 경우 - 두개로 나누어지는 형태의 그래프가 된다면 
+			// 떨어지는 순간 모두 INF로 해야한다.
+			// 즉 시작점만 넣어준다면  if(edge.w == Integer.MAX_VALUE) break; 는 의미 없다.
+			if(edge.w == Integer.MAX_VALUE) break;
+			
+			for(Edge n : adj[edge.v]) {
+				if(!check[n.v] && D[n.v].w > D[edge.v].w + n.w) {
+					D[n.v].w = D[edge.v].w + n.w;
+					
+					pq.remove(D[n.v]);
+					pq.add(D[n.v]);
 				}
 			}
-			
-			// 정렬
-			Arrays.sort(edges, new Comparator<double []>() {
-				@Override
-				public int compare(double[] o1, double[] o2) {
-					// TODO Auto-generated method stub
-					return Double.compare(o1[2], o2[2]);
-				}
-			});
-			
-			for(int i = 0; i < n; i++)
-				makeSet(i);
-			
-			int cnt1 = 0;
-			double res = 0;
-			for(int i = 0; i< E; i++) {
-				int a = (int) findSet((int)edges[i][0]);
-				int b = (int) findSet((int)edges[i][1]);
-				
-				if(a == b)
-					continue;
-				
-				union(a, b);
-				
-				res += edges[i][2];
-				cnt1 ++;
-				if(cnt1 == n-1)
-					break;
-			}
-			
-			res = res*w;
-			
-			System.out.println("#" + tc + " " + Math.round(res));
-			
+			check[edge.v] = true;
 		}
-	}
-	
-	static void makeSet(int x) {
-		p[x] =x;
-	}
-	
-	static double findSet(int x) {
-		if(x == p[x]) {
-			return x;
-		}
-		else {
-			p[x] = findSet((int)p[x]);
-			return p[x];
-		}
-	}
-	
-	static void union(int x, int y) {
-		int px = (int) findSet(x);
-		int py = (int) findSet(y);
 		
-		if(r[px] > r[py]) {
-			p[py] = px;
-		}
-		else {
-			p[px] = py;
-			if(r[px] == r[py]) {
-				r[py]++;
+		for(int i = 1; i < V; i++) {
+			if(i == start) {
+				System.out.println("0");
+			}else if(D[i].w == Integer.MAX_VALUE){
+				System.out.println("INF");
+			}else {
+				System.out.println(D[i].w);
 			}
 		}
 	}
-	
 }
