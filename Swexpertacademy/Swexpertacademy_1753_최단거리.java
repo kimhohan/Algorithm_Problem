@@ -66,9 +66,11 @@ public class Solution_1753 {
 			else {
 				D[i] = new Edge(i, Integer.MAX_VALUE);
 			}
-			// if(edge.w == Integer.MAX_VALUE) break; 가있으면
+			// 이문제의 경우 다넣을려면  if(edge.w == Integer.MAX_VALUE) break; 가 필요
+			// 시작점으로 돌아오지못하는 형태의 그래프가 존재할수있다(선분이 두개로 나누어져서 생기는 경우)
 			pq.add(D[i]);
 		}
+		
 		// if(edge.w == Integer.MAX_VALUE) break; 가없으면
 		//check[start] = true;
 		//pq.add(D[start]);
@@ -77,6 +79,9 @@ public class Solution_1753 {
 			Edge edge = pq.poll();
 			
 			// 중요!
+			// 이것을 넣으면 모든 점을 다넣을 경우 - 두개로 나누어지는 형태의 그래프가 된다면 
+			// 떨어지는 순간 모두 INF로 해야한다.
+			// 즉 시작점만 넣어준다면  if(edge.w == Integer.MAX_VALUE) break; 는 의미 없다.
 			if(edge.w == Integer.MAX_VALUE) break;
 			
 			for(Edge n : adj[edge.v]) {
