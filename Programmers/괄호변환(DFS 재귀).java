@@ -1,6 +1,5 @@
 public class Solution {
 	public static void main(String[] args) {
-		// String [] s = {"53241", "42133", "53241", "14354"};
 		String a = solution("()))((()");
 		System.out.println(a);
 
