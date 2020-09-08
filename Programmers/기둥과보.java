@@ -2,7 +2,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.plaf.synth.SynthSplitPaneUI;
 
 public class Solution {
